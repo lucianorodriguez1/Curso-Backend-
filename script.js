@@ -12,19 +12,21 @@ class ProductManager{
 
     static idProduct = 1;
 
-    verificarCampos(product){
-        if(product.title == "" || product.description == "" || product.price == undefined || product.thumbnail == "" || product.code == undefined || product.stock == undefined){
-            return false;
-        }else{
-            return true;
-        }      
+    //mejora de campos
+    verifyFields({ title, description, price, thumbnail, code, stock }) {
+        if (!title || !description || !price|| !thumbnail || !code || !stock) {
+          return false;
+        } else {
+          return true;
+        }
     }
 
     addProduct(product){
-        const existingCode = products.some(()=>products.code == product.code);
-        const camposCompletos  = this.verificarCampos(product);
+        //error corregido
+        const existingCode = products.some((p)=>p.code == product.code);
+        const camposCompletos  = this.verifyFields(product);
 
-        if(existingCode && camposCompletos){
+        if(existingCode){
             console.log(`El producto con codigo ${product.code} ya existe`);
         }else if(!camposCompletos){
             console.log("La información del producto está incompleta");
@@ -40,23 +42,23 @@ class ProductManager{
         return products;
     }
 
+    //retorna undefined si el producto no existe, estará bien?
     getProductById(id){
         const product = products.find((product)=>product.id == id);
-
         if(product == undefined){
             console.log(`El producto con id ${id} no existe`);
-            return;
+            return null;   
         }else{
-            console.log(`El producto con ID: ${id} existe`);
+            console.log(`El producto con ID ${id}:`);
             return product;
 
         }
-
     }
 }
 
 //inicializar taza
-const clase1 = new ProductManager();
+const class1 = new ProductManager();
+
 //CREO EL PRODUCTO
 const producto1 = {
     title : "taza",
@@ -76,12 +78,33 @@ const producto2 = {
     stock : 45,
 }
 
+//producto con codigo repetido
+const producto3 = {
+    title : "plato",
+    description : "sirve para poner comida y comer",
+    price : 400,
+    thumbnail : "plato.png",
+    code : 123,
+    stock : 45,
+}
+
+//producto con informacion incompleta
+const producto4 = {
+    title : "mesa",
+    description : "sirve para comer en familia",
+    price : 400,
+    thumbnail : "",
+    code : 1223,
+    stock : 45,
+}
 //agregar producto
-clase1.addProduct(producto1);
-clase1.addProduct(producto2);
+class1.addProduct(producto1);
+class1.addProduct(producto2);
+class1.addProduct(producto3);
+class1.addProduct(producto4);
 
 //mostrar productos
-console.log(clase1.getProducts());
+console.log(class1.getProducts());
 
 //buscar por id
-console.log(clase1.getProductById(4));
+console.log(class1.getProductById(3));

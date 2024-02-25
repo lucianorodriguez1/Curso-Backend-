@@ -1,0 +1,29 @@
+[
+	{
+		"title": "taza",
+		"description": "sirve para tomar el te o la leche",
+		"price": 400,
+		"thumbnail": "taza.png",
+		"code": 12443,
+		"stock": 45,
+		"id": 1
+	},
+	{
+		"title": "vasoUpdate",
+		"description": "sirve para tomar el te o la leche",
+		"price": 200,
+		"thumbnail": "vaso.png",
+		"code": 321,
+		"stock": 60,
+		"id": 2
+	},
+	{
+		"title": "mesa",
+		"description": "sirve para comer en familia",
+		"price": 400,
+		"thumbnail": "hola",
+		"code": 1223,
+		"stock": 45,
+		"id": 4
+	}
+]

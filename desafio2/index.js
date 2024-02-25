@@ -1,55 +1,88 @@
-const products = [];
+const fs = require('fs').promises;
 
-class ProductManager{
-    constructor(title,description,price,thumbnail,code,stock){
-    this.title = title;
-    this.description = description;
-    this.price = price;
-    this.thumbnail = thumbnail;
-    this.code = code;
-    this.stock = stock;
+class ProductManager {
+    constructor(title, description, price, thumbnail, code, stock) {
+        this.products = [];
+        this.path = "./products.json";
+        this.title = title;
+        this.description = description;
+        this.price = price;
+        this.thumbnail = thumbnail;
+        this.code = code;
+        this.stock = stock;
     }
-
-    static idProduct = 1;
 
     //mejora de campos
     verifyFields({ title, description, price, thumbnail, code, stock }) {
-        if (!title || !description || !price|| !thumbnail || !code || !stock) {
-          return false;
+        if (!title || !description || !price || !thumbnail || !code || !stock) {
+            return false;
         } else {
-          return true;
+            return true;
         }
     }
 
-    addProduct(product){
-        //error corregido
-        const existingCode = products.some((p)=>p.code == product.code);
-        const camposCompletos  = this.verifyFields(product);
+    async addProduct(product) {
+        const existingCode = this.products.some((p) => p.code == product.code);
+        const completedFields = this.verifyFields(product);
 
-        if(existingCode){
-            console.log(`El producto con codigo ${product.code} ya existe`);
-        }else if(!camposCompletos){
-            console.log("La información del producto está incompleta");
-        }else{
-            products.push(product)
-            product.id = ProductManager.idProduct;
-            ProductManager.idProduct++;
-            console.log(`Producto con código ${product.code} agregado con éxito.`);
+        if (existingCode) {
+            console.log(`Product with code ${product.code} already exists.`);
+        } else if (!completedFields) {
+            console.log("Product information is incomplete.");
+        } else {
+            try {
+                product.id = this.products.length + 1;
+                this.products.push(product);
+                console.log(`Product with code ${product.code} successfully added.`);
+                await fs.writeFile(this.path, JSON.stringify(this.products, null, "\t"));
+            } catch (error) {
+                console.log(error);
+            }
         }
     }
 
-    getProducts(){
-        return products;
+    async getProducts() {
+        try {
+            const productsFile = await fs.readFile(this.path, "utf-8");
+            const products = JSON.parse(productsFile);
+            return products;
+        } catch (error) {
+            console.log(error);
+        }
     }
 
-    getProductById(id){
-        const product = products.find((product)=>product.id == id);
-        if(product == undefined){
-            console.log(`El producto con id ${id} no existe`); 
-        }else{
-            console.log(`El producto con ID ${id}:`);
+    async getProductById(id) {
+        const products = await this.getProducts();
+        const product = products.find((product) => product.id == id);
+        if (!product) {
+            console.log(`Product with id ${id} does not exist`);
+        } else {
             return product;
+        }
+    }
 
+    async updateProduct(id, updateProduct) {
+        try {
+            const products = await this.getProducts();
+            const product = products.find((product) => product.id == id);
+            const index = products.findIndex((product) => product.id == id);
+            products[index] = { ...product, ...updateProduct };
+            await fs.writeFile(this.path, JSON.stringify(products, null, "\t"));
+            console.log("Product updated successfully.");
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async deleteProduct(id) {
+        try {
+            const products = await this.getProducts();
+            const index = products.findIndex((product) => product.id == id);
+            products.splice(index, 1);
+            await fs.writeFile(this.path, JSON.stringify(products, null, "\t"));
+            console.log("Producto eliminado exitosamente.");
+        } catch (error) {
+            console.log(error);
         }
     }
 }
@@ -59,50 +92,70 @@ const class1 = new ProductManager();
 
 //CREO EL PRODUCTO
 const producto1 = {
-    title : "taza",
-    description : "sirve para tomar el te o la leche",
-    price : 400,
-    thumbnail : "taza.png",
-    code : 123,
-    stock : 45,
+    title: "taza",
+    description: "sirve para tomar el te o la leche",
+    price: 400,
+    thumbnail: "taza.png",
+    code: 12443,
+    stock: 45,
 }
 
 const producto2 = {
-    title : "vaso",
-    description : "sirve para tomar el te o la leche",
-    price : 200,
-    thumbnail : "vaso.png",
-    code : 321,
-    stock : 45,
+    title: "vaso",
+    description: "sirve para tomar el te o la leche",
+    price: 200,
+    thumbnail: "vaso.png",
+    code: 321,
+    stock: 50,
 }
 
-//producto con codigo repetido
 const producto3 = {
-    title : "plato",
-    description : "sirve para poner comida y comer",
-    price : 400,
-    thumbnail : "plato.png",
-    code : 123,
-    stock : 45,
+    title: "plato",
+    description: "sirve para poner comida y comer",
+    price: 400,
+    thumbnail: "plato.png",
+    code: 123,
+    stock: 45,
 }
 
 //producto con informacion incompleta
 const producto4 = {
-    title : "mesa",
-    description : "sirve para comer en familia",
-    price : 400,
-    thumbnail : "",
-    code : 1223,
-    stock : 45,
+    title: "mesa",
+    description: "sirve para comer en familia",
+    price: 400,
+    thumbnail: "hola",
+    code: 1223,
+    stock: 45,
 }
-//agregar producto
-class1.addProduct(producto1);
-class1.addProduct(producto2);
-class1.addProduct(producto3);
-class1.addProduct(producto4);
 
-//mostrar productos
-console.log(class1.getProducts());
+//---------TEST--------------
+async function test() {
+    await class1.addProduct(producto1);
+    await class1.addProduct(producto2);
+    await class1.addProduct(producto3);
+    await class1.addProduct(producto4);
 
-//buscar por id
-console.log(class1.getProductById(3));
+    //mostrar productos
+    console.log(await class1.getProducts());
+
+    //buscar por id
+    console.log(await class1.getProductById(3));
+
+    //actualizar producto
+    await class1.updateProduct(2, {
+        title: "vasoUpdate",
+        description: "sirve para tomar el te o la leche",
+        price: 200,
+        thumbnail: "vaso.png",
+        code: 321,
+        stock:60
+    });
+
+    //eliminar producto
+    await class1.deleteProduct(3);
+    //mostrar productos con id eliminado
+    console.log(await class1.getProducts());
+}
+
+test();
+//---------------------------------

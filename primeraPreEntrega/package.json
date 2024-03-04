@@ -1,14 +1,14 @@
 {
-  "name": "curso-backend",
+  "name": "primerapreentrega",
   "version": "1.0.0",
-  "description": "curso backend 1",
+  "description": "",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon desafio3/src/app.js"
+    "dev": "nodemon src/app.js"
   },
-  "author": "luciano rodriguez",
+  "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.3"
